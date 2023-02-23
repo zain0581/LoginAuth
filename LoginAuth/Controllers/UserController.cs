@@ -10,38 +10,39 @@ namespace LoginAuth.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUser _userService;
-        public UserController(IUser userservice)
+        private readonly AppDbContext _authContext;
+        public UserController(AppDbContext appDbContext)
         {
-            _userService = userservice;
+            _authContext = appDbContext;
              
         }
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
 
-        public IActionResult GetUsers()
-        {
-            var coin = _userService.GetUsers();
-            if (!ModelState.IsValid)
+        //public IActionResult GetUsers()
+        //{
+        //    var coin = _userService.GetUsers();
+        //    if (!ModelState.IsValid)
 
-                return BadRequest(ModelState);
-            return Ok(coin);
-        }
-        [HttpPost]
-        
-        public IActionResult AddUser([FromBody] User user)
-        {
-            try
-            {
-                _userService.Adduser(user);
-                return Ok("User added successfully.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
+        //        return BadRequest(ModelState);
+        //    return Ok(coin);
+        //}
+        //[HttpPost ("regristration")]
+
+        //public IActionResult RegisterUser([FromBody] User user)
+        //{
+        //    try
+        //    {
+        //        _userService.RegisterUser(user);
+
+        //        return Ok("User added successfully.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        //    }
+        //}
 
 
 
@@ -64,36 +65,36 @@ namespace LoginAuth.Controllers
 
 
 
-        //  [HttpPost("authenticate")]
+        [HttpPost("authenticate")]
 
-        //  public async Task<IActionResult> Authenticate([FromBody] User userobj)
-        //  {
-        //      if (userobj == null)
-        //          return BadRequest();
-        //      var user = await _authcontext.User.
-        //          FirstOrDefaultAsync(x => x.UserName == userobj.UserName && x.Password == userobj.Password);
-        //      if (user == null)
-        //          return NotFound(new {Message = "user not found "});
-        //      return Ok(new
-        //      {
+        public async Task<IActionResult> Authenticate([FromBody] User userobj)
+        {
+            if (userobj == null)
+                return BadRequest();
+            var user = await _authContext.User.
+                FirstOrDefaultAsync(x => x.UserName == userobj.UserName && x.Password == userobj.Password);
+            if (user == null)
+                return NotFound(new { Message = "user not found " });
+            return Ok(new
+            {
 
-        //           Message ="Login Success!!!!!!!!!"
-        //      });
+                Message = "Login Success!!!!!!!!!"
+            });
 
-        //  }
-        //[HttpPost ("regristration")]
+        }
+        [HttpPost("regristration")]
 
-        //public async Task<IActionResult> RegisterUser([FromBody] User userobj)
-        //  {
-        //      if (userobj == null)
-        //          return BadRequest();
-        //     await _authcontext.User.AddAsync(userobj);
-        //      await _authcontext.SaveChangesAsync();
-        //      return Ok(new
-        //      {
-        //          Message = "you are register"
-        //      });
+        public async Task<IActionResult> RegisterUser([FromBody] User userobj)
+        {
+            if (userobj == null)
+                return BadRequest();
+            await _authContext.User.AddAsync(userobj);
+            await _authContext.SaveChangesAsync();
+            return Ok(new
+            {
+                Message = "you are register"
+            });
 
-        //  }
+        }
     }
 }
